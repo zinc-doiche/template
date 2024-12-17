@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="" />
+        <option name="gradleJvm" value="temurin-21" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/game" />
+            <option value="$PROJECT_DIR$/game/activity" />
+            <option value="$PROJECT_DIR$/game/core" />
+            <option value="$PROJECT_DIR$/game/hub" />
+            <option value="$PROJECT_DIR$/kafka" />
+            <option value="$PROJECT_DIR$/proxy" />
+            <option value="$PROJECT_DIR$/storage" />
+            <option value="$PROJECT_DIR$/storage/database" />
+            <option value="$PROJECT_DIR$/storage/database/api" />
+            <option value="$PROJECT_DIR$/storage/database/core" />
+            <option value="$PROJECT_DIR$/storage/history" />
+            <option value="$PROJECT_DIR$/storage/local" />
+            <option value="$PROJECT_DIR$/storage/local/api" />
+            <option value="$PROJECT_DIR$/storage/local/core" />
+            <option value="$PROJECT_DIR$/utils" />
+            <option value="$PROJECT_DIR$/utils/adventure" />
+            <option value="$PROJECT_DIR$/utils/annotation" />
+            <option value="$PROJECT_DIR$/utils/config" />
+            <option value="$PROJECT_DIR$/utils/processor" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

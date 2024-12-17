@@ -1,0 +1,6 @@
+tile:
+  hello: world
+  emergency:
+    - call: the
+      the: beat doctor
+end: 1
