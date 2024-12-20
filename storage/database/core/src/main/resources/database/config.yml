@@ -1,0 +1,20 @@
+database:
+  dataSource:
+    driverName: "com.mysql.cj.jdbc.Driver"
+    sourceName: "minecraft"
+    host: "localhost"
+    port: 3306
+    database: "minecraft"
+    username: "minecraft"
+    password: "minecraftPassword"
+  hikari:
+    maximumPoolSize: 10
+    minimumIdle: 5
+    idleTimeout: 300000
+    connectionTimeout: 60000
+  hibernate:
+    showSQL: true
+    hbm2ddl: "create"
+    isAutoCommit: false
+
+

@@ -1,19 +1,21 @@
-import plugin.ResourceMirror
+
 
 plugins {
-    id("template")
+    id("template") apply false
     id("game") apply false
+    kotlin("jvm")
 }
 
 subprojects {
     apply {
         plugin("template")
         plugin("game")
-        plugin(ResourceMirror::class.java)
     }
 
     dependencies {
         implementation(project(":storage:database:api"))
         implementation(project(":storage:local:api"))
     }
+
+
 }

@@ -29,6 +29,7 @@
             <option value="$PROJECT_DIR$/kafka" />
             <option value="$PROJECT_DIR$/proxy" />
             <option value="$PROJECT_DIR$/storage" />
+            <option value="$PROJECT_DIR$/storage/cache" />
             <option value="$PROJECT_DIR$/storage/database" />
             <option value="$PROJECT_DIR$/storage/database/api" />
             <option value="$PROJECT_DIR$/storage/database/core" />

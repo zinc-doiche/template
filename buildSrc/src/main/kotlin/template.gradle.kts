@@ -1,10 +1,15 @@
 import lib.libs
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+import plugin.ResourceMirror
 
 plugins {
     kotlin("jvm")
     kotlin("kapt")
     java
 }
+
+ResourceMirror().apply(project)
 
 kotlin {
     jvmToolchain(21)

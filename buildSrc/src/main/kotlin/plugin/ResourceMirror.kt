@@ -7,53 +7,99 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import gradle.kotlin.dsl.accessors._602de17f7470c999abbd1d0b8f55665a.compileKotlin
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import java.io.File
+import javax.inject.Inject
+import org.gradle.api.tasks.Internal
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinTest
+
+open class ResourcePluginExtension {
+    var packageName: String = "com.devport.resources"
+    var resourceDirectory: String = "src/main/resources"
+}
 
 class ResourceMirror : Plugin<Project> {
-    private val objectMapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
-
     override fun apply(target: Project) {
-        val extension = target.extensions.create("resourcePlugin", ResourcePluginExtension::class.java)
+        val pluginExtension = target.extensions.create("resourcePlugin", ResourcePluginExtension::class.java)
 
-        target.tasks.create("generateResourcesData") {
-            val resourcesFolder = File(project.projectDir, extension.resourceDirectory)
-            val packageName = extension.packageName
-            val fileSpecs = mutableListOf<FileSpec>()
-
-            resourcesFolder.walkTopDown().forEach { file ->
-                if(file.isDirectory) {
-                    file.mkdirs()
-                } else {
-                    fileSpecs.add(file.mirrorObject(packageName))
-                }
+        with(target.tasks) {
+            register<ResourceMirrorTask>(
+                "generateResourcesData",
+                ResourceMirrorTask::class.java,
+                pluginExtension
+            ).configure {
+                dependsOn("kaptKotlin")
             }
-
-            File(project.layout.buildDirectory.asFile.get(), "generated/source/kapt/main/").apply {
-                val targetPackage = File(this, extension.packageName.replace(".", "/"))
-
-                if(targetPackage.exists()) {
-                    targetPackage.deleteRecursively()
-                }
-
-                fileSpecs.forEach { fileSpec ->
-                    fileSpec.writeTo(this)
-                }
+//            withType(KaptTask::class) {
+//                dependsOn("generateResourcesData")
+//            }
+            compileKotlin.configure {
+                dependsOn("generateResourcesData")
             }
+            // kaptKotlin -> generateResourcesData -> compileKotlin
+        }
+    }
+}
+
+open class ResourceMirrorTask @Inject constructor(
+    @Internal
+    val pluginExtension: ResourcePluginExtension
+) : DefaultTask() {
+
+    @InputFiles
+    val inputFiles = project.fileTree("src/main/resources")
+
+    @OutputDirectory
+    val outputDir = project.layout.buildDirectory.file("generated/source/kapt/main")
+
+    @TaskAction
+    fun mirrorResources() {
+        val projectDir = inputFiles.asPath.split("src/main/resources")[0]
+        val objectMapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
+        val resourcesFolder = File(projectDir, pluginExtension.resourceDirectory)
+        val outputFolder = outputDir.get().asFile
+        val packageName = pluginExtension.packageName
+        val fileSpecs = mutableListOf<FileSpec>()
+        val targetPackage = File(outputFolder, pluginExtension.packageName.replace(".", "/"))
+
+        resourcesFolder.walkTopDown().forEach { file ->
+            if(file.isDirectory) {
+                file.mkdirs()
+            } else {
+                fileSpecs.add(file.mirrorObject(objectMapper, packageName))
+            }
+        }
+
+        if(targetPackage.exists()) {
+            targetPackage.deleteRecursively()
+        }
+
+        fileSpecs.forEach { fileSpec ->
+            fileSpec.writeTo(outputFolder)
         }
     }
 
-    fun File.mirrorObject(packageName: String): FileSpec {
+    fun File.mirrorObject(objectMapper: ObjectMapper, packageName: String): FileSpec {
+        @Suppress("UNCHECKED_CAST")
         val data = objectMapper.readValue(this, Any::class.java) as Map<String, Any>
-        val packageName = "$packageName.${getAbstractPath()}"
-        val specs = apart(data, packageName, nameWithoutExtension)
-        val typeSpec = TypeSpec
-            .classBuilder(nameWithoutExtension.replaceFirstChar { it.uppercase() })
+        val modifiedPackageName = "$packageName${getAbstractPath()}"
+        val specs = apart(data, modifiedPackageName, nameWithoutExtension)
+        val name = nameWithoutExtension.replaceFirstChar { it.uppercase() }
+        val typeSpec = TypeSpec.classBuilder(name)
+            .addModifiers(KModifier.DATA)
             .primaryConstructor(specs.first)
             .addProperties(specs.second)
             .addTypes(specs.third)
             .build()
 
-        return FileSpec.builder(packageName, nameWithoutExtension)
+        return FileSpec.builder(modifiedPackageName, name)
             .addType(typeSpec)
             .build()
     }
@@ -68,26 +114,29 @@ class ResourceMirror : Plugin<Project> {
     fun apart(
         data: Map<String, Any>,
         packageName: String,
-        fileName: String
+        parentName: String
     ): Triple<FunSpec, List<PropertySpec>, List<TypeSpec>> {
         val parameters = mutableListOf<ParameterSpec>()
         val properties = mutableListOf<PropertySpec>()
         val types = mutableListOf<TypeSpec>()
+        var finalPackageName = "$packageName.${parentName.replaceFirstChar { it.uppercase() }}"
 
         data.forEach { (key, value) ->
-            val className = key.replaceFirstChar { it.uppercase() }
-            val packageName = "$packageName.${fileName.replaceFirstChar { it.uppercase() }}"
-
             when(value) {
                 is Map<*, *> -> {
-                    val apart = apart(value as Map<String, Any>, packageName, fileName)
+                    val className = key.replaceFirstChar { it.uppercase() }
+                    @Suppress("UNCHECKED_CAST")
+                    val apart = apart(value as Map<String, Any>, finalPackageName, className)
                     val typeSpec = TypeSpec
                         .classBuilder(className)
                         .primaryConstructor(apart.first)
+                        .addModifiers(KModifier.DATA)
                         .addProperties(apart.second)
                         .addTypes(apart.third)
                         .build()
-                    val type = ClassName(packageName, typeSpec.name!!)
+                    val type = ClassName(finalPackageName, typeSpec.name!!)
+
+                    org.gradle.internal.cc.base.logger.lifecycle("[$parentName] APART [$finalPackageName] : \n\t $key -> $className ")
 
                     types.add(typeSpec)
                     parameters.add(
@@ -164,9 +213,4 @@ class ResourceMirror : Plugin<Project> {
             else -> data::class.asTypeName()
         }
     }
-}
-
-open class ResourcePluginExtension {
-    var packageName: String = "com.devport.resources"
-    var resourceDirectory: String = "src/main/resources"
 }

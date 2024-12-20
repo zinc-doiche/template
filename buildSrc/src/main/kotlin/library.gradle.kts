@@ -10,8 +10,14 @@ kotlin {
     jvmToolchain(21)
 }
 
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
 dependencies {
     compileOnly(libs.bundles.annotationProcessors)
+    testImplementation(libs.bundles.annotationProcessors)
 }
 
 tasks {

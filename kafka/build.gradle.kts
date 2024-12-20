@@ -1,14 +1,13 @@
-import plugin.ResourceMirror
+
 
 plugins {
     id("library")
     alias(libs.plugins.kotlinPluginSerialization)
 }
 
-ResourceMirror().apply(project)
-
 dependencies {
     compileOnly(rootProject.libs.bundles.kotlinxEcosystem)
     compileOnly(rootProject.libs.apacheKafka)
+    compileOnly(project(":utils:config"))
     testImplementation(kotlin("test"))
 }

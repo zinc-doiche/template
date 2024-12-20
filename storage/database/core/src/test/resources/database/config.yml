@@ -1,0 +1,20 @@
+database:
+  dataSource:
+    driverName: "com.mysql.cj.jdbc.Driver"
+    sourceName: "mysql"
+    host: "localhost"
+    port: 6030
+    database: "devport"
+    username: "hr"
+    password: "129f29ma2Sw"
+  hikari:
+    maximumPoolSize: 10
+    minimumIdle: 5
+    idleTimeout: 300000
+    connectionTimeout: 60000
+  hibernate:
+    showSQL: true
+    hbm2ddl: "create"
+    isAutoCommit: false
+
+

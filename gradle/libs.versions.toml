@@ -4,7 +4,6 @@
 
 [versions]
 kotlin = "2.0.21"
-kotlinxDatetime = "0.6.1"
 kotlinxSerializationJSON = "1.7.2"
 kotlinxCoroutines = "1.8.1"
 autoService = "1.1.1"
@@ -16,10 +15,17 @@ paperUserdev = "1.7.7"
 shadowJar = "8.3.5"
 jackson = "2.18.2"
 bukkitResourceConvention = "1.1.0"
+lettuce = "6.5.1.RELEASE"
+hibernate = "6.5.0.Final"
+jarkarta = "3.1.0"
+jarkartaAnnotation = "3.0.0"
+jpql = "3.5.3"
+#ehCache = "3.10.0"
+hikariCP = "5.1.0"
+mysql = "8.2.0"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 autoService = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
@@ -31,12 +37,25 @@ jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-ko
 jacksonDataformatYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 paperUserdev = { module = "io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperUserdev" }
 bukkitResourceConvention = { module = "xyz.jpenilla.resource-factory-bukkit-convention:xyz.jpenilla.resource-factory-bukkit-convention.gradle.plugin", version.ref = "bukkitResourceConvention" }
+lettuce = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
+jarkarta = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jarkarta" }
+jarkartaAnnotation = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jarkartaAnnotation" }
+jpqlDsl = { module = "com.linecorp.kotlin-jdsl:jpql-dsl", version.ref = "jpql" }
+jpqlRender = { module = "com.linecorp.kotlin-jdsl:jpql-render", version.ref = "jpql" }
+jpqlHibernateSupport = { module = "com.linecorp.kotlin-jdsl:hibernate-support", version.ref = "jpql" }
+hibernate = { module = "org.hibernate:hibernate-core", version.ref = "hibernate" }
+#hibernateJcache = { module = "org.hibernate:hibernate-jcache", version.ref = "hibernate" }
+#ehCache = { module = "org.ehcache:ehcache", version.ref = "ehCache" }
+hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikariCP" }
+mysql = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 
 # Libraries can be bundled together for easier import
 [bundles]
-kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
+kotlinxEcosystem = ["kotlinxSerialization", "kotlinxCoroutines"]
 annotationProcessors = ["autoService", "kotlinPoet", "reflections"]
 jacksons = ["jacksonDatabind", "jacksonModuleKotlin", "jacksonDataformatYaml"]
+jarkarta = ["jarkarta", "jarkartaAnnotation"]
+jpql = ["jpqlDsl", "jpqlRender", "jpqlHibernateSupport"]
 
 [plugins]
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
